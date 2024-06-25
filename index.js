@@ -1,25 +1,11 @@
 const express = require('express')
-const nodemailer = require('nodemailer')
 const bodyParser = require('body-parser')
 const fs = require('fs')
 
 const app = express()
-const port = 3000
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'codeotpverifikasi@gmail.com',
-    pass: 'zyti splg fqkd lgto',
-  },
-})
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-
-app.get('/srcdoc', (req, res) => {
-  res.redirect('/')
-})
 
 app.get('/', (req, res) => {
   res.send(`
@@ -116,27 +102,27 @@ app.get('/', (req, res) => {
   `)
 })
 
-app.post('/', (req, res) => {
-  const username = req.body.username
-  const password = req.body.password
+// app.post('/', (req, res) => {
+//   const username = req.body.username
+//   const password = req.body.password
 
-  // Mengecek apakah username dan password sesuai dengan yang ada di datauser.json
-  const data = fs.readFileSync('datauser.json')
-  const users = JSON.parse(data)
-  const user = users.find((user) => user.username === username && user.password === password)
-  if (!user) {
-    res.send('Username atau password salah. Silakan coba lagi.')
-    return
-  }
+//   // Mengecek apakah username dan password sesuai dengan yang ada di datauser.json
+//   const data = fs.readFileSync('datauser.json')
+//   const users = JSON.parse(data)
+//   const user = users.find((user) => user.username === username && user.password === password)
+//   if (!user) {
+//     res.send('Username atau password salah. Silakan coba lagi.')
+//     return
+//   }
 
-  // Mengecek apakah pengguna sudah diverifikasi
-  if (!user.verified) {
-    res.send('Akun Anda belum diverifikasi. Silakan verifikasi terlebih dahulu.')
-    return
-  }
+//   // Mengecek apakah pengguna sudah diverifikasi
+//   if (!user.verified) {
+//     res.send('Akun Anda belum diverifikasi. Silakan verifikasi terlebih dahulu.')
+//     return
+//   }
 
-  res.redirect('/')
-})
+//   res.redirect('/')
+// })
 
 app.listen(3000, () => console.log('Server ready on port 3000.'))
 
