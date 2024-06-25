@@ -104,38 +104,24 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', (req, res) => {
-  //   const username = req.body.username
-  //   const password = req.body.password
+  const username = req.body.username
+  const password = req.body.password
 
   const dataPath = path.join(__dirname, 'public', 'datauser.json')
 
   fs.readFile(dataPath, 'utf8', (err, data) => {
-    if (err) {
-      res.status(500).send('Error reading user data')
-      return
-    }
+    if (err) return res.status(500).send('Error reading user data')
 
     const users = JSON.parse(data)
-    res.send(users)
+
+    const user = users.find((user) => user.username === username && user.password === password)
+
+    if (!user) return res.send('Username atau password salah. Silakan coba lagi.')
+
+    if (!user.verified) return res.send('Akun Anda belum diverifikasi. Silakan verifikasi terlebih dahulu.')
+
+    return res.redirect('/')
   })
-
-  //   const data = fs.readFileSync('./datauser.json')
-  //   const users = JSON.parse(data)
-  //   const user = users.find((user) => user.username === username && user.password === password)
-
-  //   if (!user) {
-  //     res.send('Username atau password salah. Silakan coba lagi.')
-  //     return
-  //   }
-
-  //   if (!user.verified) {
-  //     res.send('Akun Anda belum diverifikasi. Silakan verifikasi terlebih dahulu.')
-  //     return
-  //   }
-
-  //   res.redirect('/')
-
-  //   res.send(users)
 })
 
 app.listen(3000, () => console.log('Server ready on port 3000.'))
