@@ -1,27 +1,27 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const bodyParser = require('body-parser');
-const fs = require('fs');
+const express = require('express')
+const nodemailer = require('nodemailer')
+const bodyParser = require('body-parser')
+const fs = require('fs')
 
-const app = express();
-const port = 3000;
+const app = express()
+const port = 3000
 
 // Konfigurasi transporter untuk mengirim email menggunakan Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'codeotpverifikasi@gmail.com',
-    pass: 'zyti splg fqkd lgto'
-  }
-});
+    pass: 'zyti splg fqkd lgto',
+  },
+})
 
 // Menggunakan middleware body-parser
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 app.get('/srcdoc', (req, res) => {
-  res.redirect('/');
-});
+  res.redirect('/')
+})
 
 // Menampilkan halaman login
 app.get('/', (req, res) => {
@@ -116,29 +116,29 @@ app.get('/', (req, res) => {
         </div>
       </body>
     </html>
-  `);
-});
+  `)
+})
 app.post('/', (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
+  const username = req.body.username
+  const password = req.body.password
 
   // Mengecek apakah username dan password sesuai dengan yang ada di datauser.json
-  const data = fs.readFileSync('datauser.json');
-  const users = JSON.parse(data);
-  const user = users.find(user => user.username === username && user.password === password);
+  const data = fs.readFileSync('datauser.json')
+  const users = JSON.parse(data)
+  const user = users.find((user) => user.username === username && user.password === password)
   if (!user) {
-    res.send('Username atau password salah. Silakan coba lagi.');
-    return;
+    res.send('Username atau password salah. Silakan coba lagi.')
+    return
   }
 
   // Mengecek apakah pengguna sudah diverifikasi
   if (!user.verified) {
-    res.send('Akun Anda belum diverifikasi. Silakan verifikasi terlebih dahulu.');
-    return;
+    res.send('Akun Anda belum diverifikasi. Silakan verifikasi terlebih dahulu.')
+    return
   }
 
-  res.redirect('https://7999bacc-9b21-42c0-9e60-e5a3b41a3290-00-nxo1oxhcqzu0.sisko.replit.dev/');
-});
+  res.redirect('https://7999bacc-9b21-42c0-9e60-e5a3b41a3290-00-nxo1oxhcqzu0.sisko.replit.dev/')
+})
 
 // Menampilkan halaman daftar
 app.get('/register', (req, res) => {
@@ -236,52 +236,52 @@ app.get('/register', (req, res) => {
         </div>
       </body>
     </html>
-  `);
-});
+  `)
+})
 
 // Mengirimkan kode OTP melalui email
 app.post('/register', (req, res) => {
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
+  const username = req.body.username
+  const email = req.body.email
+  const password = req.body.password
 
   // Cek apakah username sudah ada yang menggunakan
-  const data = fs.readFileSync('datauser.json');
-  let users = [];
+  const data = fs.readFileSync('datauser.json')
+  let users = []
   if (data.length !== 0) {
-    users = JSON.parse(data);
-    const existingUser = users.find(user => user.username === username);
+    users = JSON.parse(data)
+    const existingUser = users.find((user) => user.username === username)
     if (existingUser) {
-      res.send('Username sudah digunakan. Silakan gunakan username lain.');
-      return;
+      res.send('Username sudah digunakan. Silakan gunakan username lain.')
+      return
     }
   }
 
   // Cek apakah email sudah ada yang menggunakan
-  const existingEmail = users.find(user => user.email === email);
+  const existingEmail = users.find((user) => user.email === email)
   if (existingEmail) {
-    res.send('Email sudah digunakan. Silakan gunakan email lain.');
-    return;
+    res.send('Email sudah digunakan. Silakan gunakan email lain.')
+    return
   }
 
   // Generate kode OTP acak
-  const otp = Math.floor(100000 + Math.random() * 900000);
+  const otp = Math.floor(100000 + Math.random() * 900000)
 
   // Konfigurasi email yang akan dikirim
   const mailOptions = {
     from: 'codeotpverifikasi@gmail.com',
     to: email,
     subject: 'Kode OTP untuk Verifikasi',
-    text: `Kode OTP Anda adalah: ${otp}`
-  };
+    text: `Kode OTP Anda adalah: ${otp}`,
+  }
 
   // Mengirim email
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.log(error);
-      res.send('Terjadi kesalahan saat mengirim email.');
+      console.log(error)
+      res.send('Terjadi kesalahan saat mengirim email.')
     } else {
-      console.log('Email terkirim: ' + info.response);
+      console.log('Email terkirim: ' + info.response)
 
       // Menyimpan data pengguna ke file JSON
       const newUser = {
@@ -289,15 +289,15 @@ app.post('/register', (req, res) => {
         password: password,
         email: email,
         otp: otp,
-        verified: false
-      };
-      users.push(newUser);
-      fs.writeFileSync('datauser.json', JSON.stringify(users));
+        verified: false,
+      }
+      users.push(newUser)
+      fs.writeFileSync('datauser.json', JSON.stringify(users))
 
-      res.redirect('/verify'); // Mengarahkan pengguna ke halaman verifikasi
+      res.redirect('/verify') // Mengarahkan pengguna ke halaman verifikasi
     }
-  });
-});
+  })
+})
 
 // Menampilkan halaman verifikasi kode OTP
 app.get('/verify', (req, res) => {
@@ -377,24 +377,24 @@ app.get('/verify', (req, res) => {
         </div>
       </body>
     </html>
-  `);
-});
+  `)
+})
 
 app.post('/verify', (req, res) => {
-  const enteredOtp = req.body.otp;
+  const enteredOtp = req.body.otp
 
   // Mengecek apakah kode OTP yang dimasukkan sesuai dengan yang dikirimkan
-  const data = fs.readFileSync('datauser.json');
-  const users = JSON.parse(data);
-  const user = users.find(user => user.otp === parseInt(enteredOtp));
+  const data = fs.readFileSync('datauser.json')
+  const users = JSON.parse(data)
+  const user = users.find((user) => user.otp === parseInt(enteredOtp))
   if (!user) {
-    res.send('Kode OTP tidak valid. Silakan coba lagi.');
-    return;
+    res.send('Kode OTP tidak valid. Silakan coba lagi.')
+    return
   }
 
   // Mengupdate status verifikasi pengguna
-  user.verified = true;
-  fs.writeFileSync('datauser.json', JSON.stringify(users));
+  user.verified = true
+  fs.writeFileSync('datauser.json', JSON.stringify(users))
   res.send(`
     <html>
       <head>
@@ -449,9 +449,9 @@ app.post('/verify', (req, res) => {
         </div>
       </body>
     </html>
-  `);
-});
+  `)
+})
 
 app.listen(port, () => {
-  console.log(`Server berjalan di http://localhost:${port}`);
-});
+  console.log(`Server berjalan di http://localhost:${port}`)
+})
