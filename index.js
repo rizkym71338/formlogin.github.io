@@ -106,8 +106,8 @@ app.post('/', (req, res) => {
   //   const username = req.body.username
   //   const password = req.body.password
 
-  //   const data = fs.readFileSync('./datauser.json')
-  //   const users = JSON.parse(data)
+  const data = fs.readFileSync('./datauser.json')
+  const users = JSON.parse(data)
   //   const user = users.find((user) => user.username === username && user.password === password)
 
   //   if (!user) {
@@ -122,7 +122,7 @@ app.post('/', (req, res) => {
 
   //   res.redirect('/')
 
-  res.send(req.body)
+  res.send(users)
 })
 
 app.listen(3000, () => console.log('Server ready on port 3000.'))
