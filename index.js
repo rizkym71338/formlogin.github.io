@@ -1,4 +1,5 @@
 const express = require('express')
+const nodemailer = require('nodemailer')
 const bodyParser = require('body-parser')
 const path = require('path')
 const fs = require('fs')
@@ -8,8 +9,10 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.get('/', (req, res) => {
-  res.send(`
+const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: 'codeotpverifikasi@gmail.com', pass: 'zyti splg fqkd lgto' } })
+
+app.get('/', (_, res) => {
+  return res.send(`
     <html>
       <head>
         <style>
@@ -104,8 +107,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', (req, res) => {
-  const username = req.body.username
-  const password = req.body.password
+  const { username, password } = req.body
 
   const dataPath = path.join(__dirname, 'public', 'datauser.json')
 
@@ -125,7 +127,7 @@ app.post('/', (req, res) => {
 })
 
 app.get('/register', (_, res) => {
-  res.send(`
+  return res.send(`
     <html>
       <head>
         <style>
@@ -223,9 +225,7 @@ app.get('/register', (_, res) => {
 })
 
 app.post('/register', (req, res) => {
-  const username = req.body.username
-  const email = req.body.email
-  const password = req.body.password
+  const { username, email, password } = req.body
 
   const dataPath = path.join(__dirname, 'public', 'datauser.json')
 
@@ -244,12 +244,7 @@ app.post('/register', (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000)
 
-    const mailOptions = {
-      from: 'codeotpverifikasi@gmail.com',
-      to: email,
-      subject: 'Kode OTP untuk Verifikasi',
-      text: `Kode OTP Anda adalah: ${otp}`,
-    }
+    const mailOptions = { from: 'codeotpverifikasi@gmail.com', to: email, subject: 'Kode OTP untuk Verifikasi', text: `Kode OTP Anda adalah: ${otp}` }
 
     transporter.sendMail(mailOptions, (error) => {
       if (error) return res.send('Terjadi kesalahan saat mengirim email.')
@@ -261,14 +256,14 @@ app.post('/register', (req, res) => {
       fs.writeFile(dataPath, JSON.stringify(users, null, 2), (err) => {
         if (err) return res.status(500).send('Error writing user data')
 
-        res.redirect('/verify')
+        return res.redirect('/verify')
       })
     })
   })
 })
 
 app.get('/verify', (_, res) => {
-  res.send(`
+  return res.send(`
     <html>
       <head>
         <style>
@@ -348,7 +343,7 @@ app.get('/verify', (_, res) => {
 })
 
 app.post('/verify', (req, res) => {
-  const enteredOtp = req.body.otp
+  const { otp } = req.body
 
   const dataPath = path.join(__dirname, 'public', 'datauser.json')
 
@@ -357,7 +352,7 @@ app.post('/verify', (req, res) => {
 
     const users = JSON.parse(data)
 
-    const user = users.find((user) => user.otp === parseInt(enteredOtp))
+    const user = users.find((user) => user.otp === parseInt(otp))
 
     if (!user) return res.send('Kode OTP tidak valid. Silakan coba lagi.')
 
@@ -366,7 +361,7 @@ app.post('/verify', (req, res) => {
     fs.writeFile(dataPath, JSON.stringify(users, null, 2), (err) => {
       if (err) return res.status(500).send('Error writing user data')
 
-      res.send(`
+      return res.send(`
     <html>
       <head>
         <style>
