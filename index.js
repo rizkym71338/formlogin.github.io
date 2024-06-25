@@ -1,7 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const fs = require('fs')
 const path = require('path')
+const fs = require('fs')
 
 const app = express()
 
@@ -124,7 +124,7 @@ app.post('/', (req, res) => {
   })
 })
 
-app.get('/register', (req, res) => {
+app.get('/register', (_, res) => {
   res.send(`
     <html>
       <head>
@@ -232,7 +232,7 @@ app.post('/register', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading user data')
 
-    users = JSON.parse(dataPath)
+    users = JSON.parse(data)
 
     const existingUser = users.find((user) => user.username === username)
 
@@ -251,16 +251,10 @@ app.post('/register', (req, res) => {
       text: `Kode OTP Anda adalah: ${otp}`,
     }
 
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, (error) => {
       if (error) return res.send('Terjadi kesalahan saat mengirim email.')
 
-      const newUser = {
-        username: username,
-        password: password,
-        email: email,
-        otp: otp,
-        verified: false,
-      }
+      const newUser = { username: username, password: password, email: email, otp: otp, verified: false }
 
       users.push(newUser)
 
@@ -273,7 +267,7 @@ app.post('/register', (req, res) => {
   })
 })
 
-app.get('/verify', (req, res) => {
+app.get('/verify', (_, res) => {
   res.send(`
     <html>
       <head>
@@ -361,7 +355,7 @@ app.post('/verify', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading user data')
 
-    const users = JSON.parse(dataPath)
+    const users = JSON.parse(data)
 
     const user = users.find((user) => user.otp === parseInt(enteredOtp))
 
